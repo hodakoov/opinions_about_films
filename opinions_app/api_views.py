@@ -16,6 +16,8 @@ def get_opinion(id):
 @app.route('/api/opinions/<int:id>/', methods=['PATCH'])
 def update_opinion(id):
     data = request.get_json()
+    if 'text' in data and Opinion.query.filter_by(text=data['text']).first() is not None:
+        return jsonify({'error': 'Такое мнение уже есть в базе данных'}), 400
     opinion = Opinion.query.get_or_404(id)
 
     opinion.title = data.get('title', opinion.title)
@@ -45,6 +47,10 @@ def get_opinions():
 @app.route('/api/opinions/', methods=['POST'])
 def add_opinion():
     data = request.get_json()
+    if 'title' not in data or 'text' not in data:
+        return jsonify({'error': 'В запросе отсутствуют обязательные поля'}), 400
+    if Opinion.query.filter_by(text=data['text']).first() is not None:
+        return jsonify({'error': 'Такое мнение уже есть в базе данных'}), 400
     opinion = Opinion()
     opinion.from_dict(data)
 
