@@ -11,6 +11,7 @@ class Opinion(db.Model):
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     added_by = db.Column(db.String(64))
 
+    # Сериализатор
     def to_dict(self):
         return dict(
             id=self.id,
@@ -20,3 +21,10 @@ class Opinion(db.Model):
             timestamp=self.timestamp,
             added_by=self.added_by
         )
+
+    # Метод-десериализатор
+    def from_dict(self, data):
+        for field in ['title', 'text', 'source', 'added_by']:
+            if field in data:
+                setattr(self, field, data[field])
+
